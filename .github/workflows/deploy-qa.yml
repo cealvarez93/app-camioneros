@@ -42,6 +42,7 @@ jobs:
           fetch-depth: 0
       - name: Abrir o actualizar el PR de promoción a producción
         run: |
+          if [ "$(git rev-list --count origin/main..origin/qa)" = "0" ]; then echo "qa y main están iguales; no hay nada que promover"; exit 0; fi
           CAMBIOS=$(git log origin/main..origin/qa --no-merges --pretty='- %s')
           CUERPO=$(printf 'Promoción de QA %s a producción.\n\nCambios desde el último despliegue:\n%s\n\nValida en QA y aprueba con validar_qa.' "$GITHUB_SHA" "$CAMBIOS")
           N=$(gh pr list --base main --head qa --state open --json number --jq '.[0].number // empty')

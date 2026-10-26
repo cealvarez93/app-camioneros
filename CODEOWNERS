@@ -1,0 +1,10 @@
+/.github/ @__OWNER__
+/mcp/ @__OWNER__
+/scripts/ @__OWNER__
+/android/ @__OWNER__
+/functions/ @__OWNER__
+/package.json @__OWNER__
+/package-lock.json @__OWNER__
+/capacitor.config.json @__OWNER__
+/vite.config.js @__OWNER__
+/CODEOWNERS @__OWNER__

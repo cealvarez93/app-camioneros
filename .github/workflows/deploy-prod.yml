@@ -1,0 +1,54 @@
+name: deploy-prod
+on:
+  push:
+    branches: [main]
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  desplegar:
+    if: ${{ vars.PROD_API_BASE != '' }}
+    uses: ./.github/workflows/_desplegar.yml
+    with:
+      ambiente: production
+      ref: ${{ github.sha }}
+      proyecto: ${{ vars.CF_PROJECT_PROD }}
+      api_base: ${{ vars.PROD_API_BASE }}
+    secrets: inherit
+
+  smoke-prod:
+    needs: desplegar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/smoke.mjs "${{ vars.PROD_URL }}" "${{ needs.desplegar.outputs.sha }}" --api "${{ vars.PROD_API_BASE }}"
+
+  marcar-ok:
+    needs: smoke-prod
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git tag -f prod-ok "$GITHUB_SHA"
+          git push -f origin prod-ok
+
+  rollback-auto:
+    needs: [desplegar, smoke-prod]
+    if: ${{ always() && (needs.desplegar.result == 'failure' || needs.smoke-prod.result == 'failure') }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh workflow run rollback.yml --ref main -f motivo="auto: despliegue o smoke fallido en $GITHUB_SHA"
+          exit 1

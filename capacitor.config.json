@@ -1,0 +1,6 @@
+{
+  "appId": "cl.sbi.logistic",
+  "appName": "Logistic Tracking",
+  "webDir": "dist",
+  "server": { "androidScheme": "https", "cleartext": true }
+}

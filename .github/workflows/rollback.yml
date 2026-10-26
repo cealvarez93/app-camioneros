@@ -1,0 +1,31 @@
+name: rollback
+on:
+  workflow_dispatch:
+    inputs:
+      motivo:
+        description: Motivo del rollback
+        required: true
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  desplegar:
+    uses: ./.github/workflows/_desplegar.yml
+    with:
+      ambiente: production
+      ref: prod-ok
+      proyecto: ${{ vars.CF_PROJECT_PROD }}
+      api_base: ${{ vars.PROD_API_BASE }}
+    secrets: inherit
+
+  smoke-rollback:
+    needs: desplegar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/smoke.mjs "${{ vars.PROD_URL }}" "${{ needs.desplegar.outputs.sha }}" --api "${{ vars.PROD_API_BASE }}"

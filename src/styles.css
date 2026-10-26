@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { font-family: Roboto, system-ui, sans-serif; background: #323232; color: #fff; }
+.logo { background: #fff; padding: 4px 10px; height: 64px; }
+.logo img { height: 100%; display: block; }
+.screen { min-height: 100dvh; display: flex; flex-direction: column; position: relative; }
+.pill { align-self: center; margin: 12px 0; padding: 8px 22px; background: #f40009; color: #fff; border-radius: 12px; font-size: 1.6rem; box-shadow: 0 3px 6px #0006; text-align: center; }
+main { flex: 1; padding: 16px 20px; }
+footer { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px 24px; font-size: 1.15rem; }
+footer img { height: 56px; }
+.form { display: flex; flex-direction: column; gap: 22px; }
+.form.grid label { display: grid; grid-template-columns: 1fr 1.2fr; align-items: end; font-size: 1.2rem; }
+.form:not(.grid) label { display: flex; flex-direction: column; gap: 6px; font-size: 1.2rem; }
+input, select { background: transparent; color: #fff; border: 0; border-bottom: 1px solid #ccc; padding: 8px 2px; font-size: 1.15rem; min-width: 0; }
+select option { color: #000; }
+button.red { background: #f40009; color: #fff; border: 0; border-radius: 16px; padding: 16px; font-size: 1.1rem; font-weight: 500; }
+.err { color: #ff8a80; margin: 0; } .ok { color: #9be39b; margin: 0; }
+.profile div { display: flex; justify-content: space-between; padding: 22px 0; font-size: 1.25rem; }
+.profile dd { margin: 0; color: #ddd; } .profile dt { color: #ccc; }
+.queue { font-size: 1.5rem; text-align: center; margin-top: 60px; }
+.qr { display: block; width: min(80vw, 380px); margin: 40px auto; background: #fff; padding: 8px; }
+.back { position: absolute; top: 72px; left: 8px; background: transparent; border: 0; color: #fff; font-size: 2.4rem; }
+.home { min-height: 100dvh; background-size: cover; background-position: center; position: relative; }
+.round { position: absolute; width: 17%; aspect-ratio: 1; border-radius: 50%; border: 0; padding: 0; overflow: hidden; background: #eee; box-shadow: 0 2px 8px #0008; }
+.round img { width: 100%; height: 100%; object-fit: cover; }
+.homefoot { position: absolute; bottom: 0; left: 0; right: 0; color: #fff; text-shadow: 0 1px 3px #000; }
+.logout { position: absolute; top: 72px; right: 8px; background: #0007; color: #fff; border: 0; border-radius: 10px; padding: 6px 12px; }

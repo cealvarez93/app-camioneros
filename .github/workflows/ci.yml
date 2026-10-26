@@ -1,0 +1,22 @@
+name: ci
+on:
+  pull_request:
+    branches: [qa, main]
+  push:
+    branches: [qa, main]
+permissions:
+  contents: read
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/fetch-assets.mjs
+      - run: npm test
+      - run: npm run build
+      - run: node scripts/guard-build.mjs

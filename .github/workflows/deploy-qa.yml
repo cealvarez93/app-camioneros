@@ -1,0 +1,54 @@
+name: deploy-qa
+on:
+  push:
+    branches: [qa]
+concurrency:
+  group: deploy-qa
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  desplegar:
+    uses: ./.github/workflows/_desplegar.yml
+    with:
+      ambiente: qa
+      ref: ${{ github.sha }}
+      proyecto: ${{ vars.CF_PROJECT_QA }}
+      con_functions: true
+    secrets: inherit
+
+  smoke-qa:
+    needs: desplegar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/smoke.mjs "${{ vars.QA_URL }}" "${{ needs.desplegar.outputs.sha }}" --api "${{ vars.QA_URL }}"
+
+  promover:
+    needs: smoke-qa
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Abrir o actualizar el PR de promoción a producción
+        run: |
+          CAMBIOS=$(git log origin/main..origin/qa --no-merges --pretty='- %s')
+          CUERPO=$(printf 'Promoción de QA %s a producción.\n\nCambios desde el último despliegue:\n%s\n\nValida en QA y aprueba con validar_qa.' "$GITHUB_SHA" "$CAMBIOS")
+          N=$(gh pr list --base main --head qa --state open --json number --jq '.[0].number // empty')
+          if [ -z "$N" ]; then
+            gh pr create --base main --head qa --title "Promover QA a producción" --body "$CUERPO"
+            N=$(gh pr list --base main --head qa --state open --json number --jq '.[0].number')
+          else
+            gh pr edit "$N" --body "$CUERPO"
+          fi
+          gh pr merge "$N" --auto --merge

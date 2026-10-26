@@ -1,0 +1,53 @@
+name: desplegar
+on:
+  workflow_call:
+    inputs:
+      ambiente: { type: string, required: true }
+      ref: { type: string, required: true }
+      proyecto: { type: string, required: true }
+      api_base: { type: string, default: '' }
+      con_functions: { type: boolean, default: false }
+    outputs:
+      sha:
+        value: ${{ jobs.desplegar.outputs.sha }}
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ambiente }}
+    permissions:
+      contents: read
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      - id: sha
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.ASSETS_REPO }}
+          token: ${{ secrets.ASSETS_TOKEN }}
+          path: .assets
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: node scripts/fetch-assets.mjs --require
+        env:
+          ASSETS_DIR: .assets
+      - if: ${{ !inputs.con_functions }}
+        run: rm -rf functions
+      - run: npm run build
+        env:
+          VITE_API_BASE: ${{ inputs.api_base }}
+      - run: node scripts/write-version.mjs
+        env:
+          APP_ENV: ${{ inputs.ambiente }}
+          APP_SHA: ${{ steps.sha.outputs.sha }}
+      - run: node scripts/guard-build.mjs
+      - run: npx --yes wrangler@3.114.17 pages deploy dist --project-name="${{ inputs.proyecto }}" --branch=main --commit-hash="${{ steps.sha.outputs.sha }}" --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}

@@ -66,27 +66,23 @@ function MenuButton() {
   );
 }
 
-// variant "light": header blanco con logo centrado (login). "dark": header delgado con logo, estado y menú, más barra de pantalla.
-export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, top = true, children }) {
+// Header único (logo, estado y menú) para todas las pantallas; las internas suman la barra con atrás y título.
+export function Shell({ title, titleIcon: TitleIcon, onBack, top = true, children }) {
   return (
     <div className={`app${top ? ' app--top' : ''}`}>
-      {variant === 'light' ? (
-        <header className="app-header"><img src={logo} alt={brand.clientName} /></header>
-      ) : (
-        <header className="app-header app-header--dark">
-          <div className="app-header__row">
-            <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
-            <div className="app-header__end"><OnlineChip /><MenuButton /></div>
+      <header className="app-header">
+        <div className="app-header__row">
+          <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
+          <div className="app-header__end"><OnlineChip /><MenuButton /></div>
+        </div>
+        {title && (
+          <div className="screen-bar">
+            <button className="icon-btn" onClick={onBack} aria-label="Volver"><ChevronLeftIcon /></button>
+            <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>
+            <span className="screen-bar__spacer" />
           </div>
-          {title && (
-            <div className="screen-bar">
-              <button className="icon-btn" onClick={onBack} aria-label="Volver"><ChevronLeftIcon /></button>
-              <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>
-              <span className="screen-bar__spacer" />
-            </div>
-          )}
-        </header>
-      )}
+        )}
+      </header>
       <main className="app__main">{children}</main>
       <AppFooter />
     </div>

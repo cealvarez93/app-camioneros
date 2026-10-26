@@ -12,7 +12,7 @@ const PALLETS = Array.from({ length: 30 }, (_, i) => String(i + 1));
 const SESSION = 'logistic.session';
 const load = () => { try { return JSON.parse(localStorage.getItem(SESSION)); } catch { return null; } };
 
-function Login({ onLogin, onAbout }) {
+function Login({ onLogin }) {
   const [user, setUser] = useState('');
   const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
@@ -30,7 +30,7 @@ function Login({ onLogin, onAbout }) {
     }
   };
   return (
-    <Shell variant="light" top={false}>
+    <Shell top={false}>
       <div className="badge"><TruckIcon />{brand.appName}</div>
       <Card>
         <form onSubmit={submit} className="stack">
@@ -40,7 +40,6 @@ function Login({ onLogin, onAbout }) {
           <Button type="submit" icon={ArrowIcon}>Acceso</Button>
         </form>
       </Card>
-      <button className="link-btn" onClick={onAbout}>Acerca de</button>
     </Shell>
   );
 }
@@ -259,11 +258,12 @@ export default function App() {
   ];
   const view = (() => {
     if (screen === 'about') return <About back={back} />;
-    if (!session) return <Login onLogin={setSession} onAbout={() => go('about')} />;
+    if (!session) return <Login onLogin={setSession} />;
     if (screen === 'profile') return <Profile session={session} back={back} />;
     if (screen === 'trip') return <Trip session={session} back={back} />;
     if (screen === 'pass') return <Pass session={session} go={go} back={back} />;
     return <Home session={session} go={go} />;
   })();
-  return <MenuContext.Provider value={session ? menu : []}>{view}</MenuContext.Provider>;
+  const publicMenu = menu.filter((it) => it.label === 'Acerca de');
+  return <MenuContext.Provider value={session ? menu : publicMenu}>{view}</MenuContext.Provider>;
 }

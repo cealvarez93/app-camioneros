@@ -4,7 +4,7 @@ import { api } from './api.js';
 import { brand } from './brand.js';
 import { buildQrPayload } from './qr.js';
 import { formatRut, iniciales } from './format.js';
-import { ArrowIcon, BoxIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, RefreshIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
+import { ArrowIcon, BoxIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, InfoIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, RefreshIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
 import { Button, Card, Field, PasswordField, SectionCard, Shell } from './ui.jsx';
 import hero from './assets/bg3.jpg';
 
@@ -12,7 +12,7 @@ const PALLETS = Array.from({ length: 30 }, (_, i) => String(i + 1));
 const SESSION = 'logistic.session';
 const load = () => { try { return JSON.parse(localStorage.getItem(SESSION)); } catch { return null; } };
 
-function Login({ onLogin }) {
+function Login({ onLogin, onAbout }) {
   const [user, setUser] = useState('');
   const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
@@ -31,7 +31,7 @@ function Login({ onLogin }) {
   };
   return (
     <Shell variant="light" top={false}>
-      <div className="badge"><TruckIcon />{brand.appName}<span className="badge__version">{brand.version}</span></div>
+      <div className="badge"><TruckIcon />{brand.appName}</div>
       <p className="tagline">{brand.tagline}</p>
       <Card>
         <form onSubmit={submit} className="stack">
@@ -41,6 +41,7 @@ function Login({ onLogin }) {
           <Button type="submit" icon={ArrowIcon}>Acceso</Button>
         </form>
       </Card>
+      <button className="link-btn" onClick={onAbout}>Acerca de</button>
     </Shell>
   );
 }
@@ -56,7 +57,7 @@ function Home({ session, go, logout }) {
     <Shell onLogout={logout}>
       <section className="hero" style={{ '--hero-image': `url(${hero})` }}>
         <div className="hero__top">
-          <span className={`chip${trip ? ' chip--ok' : ''}`}><span className="chip__dot" />{trip ? 'Viaje registrado' : 'Sin viaje registrado'}</span>
+          {trip && <span className="chip chip--ok"><span className="chip__dot" />Viaje registrado</span>}
           {trip && <span className="chip chip--mono">{trip.Truck}</span>}
         </div>
         <div>
@@ -65,7 +66,7 @@ function Home({ session, go, logout }) {
           {trip && <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>}
         </div>
       </section>
-      <div className="section-head"><h2>Operaciones rápidas</h2><span>3 módulos</span></div>
+      <div className="section-head"><h2>Operaciones rápidas</h2></div>
       <div className="actions">
         <button className="action action--primary" onClick={() => go('trip')}>
           <TruckIcon className="action__icon" />
@@ -81,6 +82,28 @@ function Home({ session, go, logout }) {
           <span><span className="action__title">Pase de validación</span><span className="action__hint">{wait === null ? 'Espera y código QR' : `Espera aprox. ${wait} min`}</span></span>
         </button>
       </div>
+      <button className="link-btn" onClick={() => go('about')}>Acerca de</button>
+    </Shell>
+  );
+}
+
+function About({ back }) {
+  const rows = [
+    ['Aplicación', brand.appName, TruckIcon],
+    ['Versión', brand.version.replace(/^v/, ''), InfoIcon],
+    ['Cliente', brand.clientName, BuildingIcon],
+    ['Desarrollado por', brand.partnerName, UserCircleIcon],
+  ];
+  return (
+    <Shell title="Acerca de" titleIcon={InfoIcon} onBack={back}>
+      <ul className="list">
+        {rows.map(([label, value, Icon]) => (
+          <li className="list__row" key={label}>
+            <Icon className="list__icon" />
+            <div className="list__text"><p className="list__label">{label}</p><p className="list__value">{value}</p></div>
+          </li>
+        ))}
+      </ul>
     </Shell>
   );
 }
@@ -227,7 +250,8 @@ export default function App() {
   const [session, setSession] = useState(load());
   const [screen, setScreen] = useState('home');
   const back = () => setScreen('home');
-  if (!session) return <Login onLogin={setSession} />;
+  if (screen === 'about') return <About back={back} />;
+  if (!session) return <Login onLogin={setSession} onAbout={() => setScreen('about')} />;
   const logout = () => { localStorage.removeItem(SESSION); setSession(null); setScreen('home'); };
   if (screen === 'profile') return <Profile session={session} back={back} />;
   if (screen === 'trip') return <Trip session={session} back={back} />;

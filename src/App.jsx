@@ -55,34 +55,38 @@ function Home({ session, go, logout }) {
   }, [session.driverId]);
   return (
     <Shell onLogout={logout}>
-      <section className="hero" style={{ '--hero-image': `url(${hero})` }}>
-        <div className="hero__top">
-          {trip && <span className="chip chip--ok"><span className="chip__dot" />Viaje registrado</span>}
-          {trip && <span className="chip chip--mono">{trip.Truck}</span>}
+      <section className="hero hero--fill" style={{ '--hero-image': `url(${hero})` }}>
+        <div className="hero__head">
+          <div className="hero__top">
+            {trip && <span className="chip chip--ok"><span className="chip__dot" />Viaje registrado</span>}
+            {trip && <span className="chip chip--mono">{trip.Truck}</span>}
+          </div>
+          <div>
+            <p className="hero__label">{trip ? 'Ruta asignada' : 'Viaje'}</p>
+            <h2 className="hero__route">{trip ? `${trip.Origin} → ${trip.Destination}` : 'Registra tu viaje para generar el QR'}</h2>
+            {trip && <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>}
+          </div>
         </div>
-        <div>
-          <p className="hero__label">{trip ? 'Ruta asignada' : 'Viaje'}</p>
-          <h2 className="hero__route">{trip ? `${trip.Origin} → ${trip.Destination}` : 'Registra tu viaje para generar el QR'}</h2>
-          {trip && <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>}
+        <div className="hero__bottom">
+          <div className="section-head"><h2>Operaciones rápidas</h2></div>
+          <div className="actions">
+            <button className="action action--primary" onClick={() => go('trip')}>
+              <TruckIcon className="action__icon" />
+              <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span><span className="action__hint">Origen, destino y carga</span></span>
+              <ChevronRightIcon className="action__go" />
+            </button>
+            <button className="action" onClick={() => go('profile')}>
+              <IdCardIcon className="action__icon" />
+              <span><span className="action__title">Perfil conductor</span><span className="action__hint">Tus datos y tu empresa</span></span>
+            </button>
+            <button className="action action--ok" onClick={() => go('pass')}>
+              <QrIcon className="action__icon" />
+              <span><span className="action__title">Pase de validación</span><span className="action__hint">{wait === null ? 'Espera y código QR' : `Espera aprox. ${wait} min`}</span></span>
+            </button>
+          </div>
+          <button className="link-btn" onClick={() => go('about')}>Acerca de</button>
         </div>
       </section>
-      <div className="section-head"><h2>Operaciones rápidas</h2></div>
-      <div className="actions">
-        <button className="action action--primary" onClick={() => go('trip')}>
-          <TruckIcon className="action__icon" />
-          <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span><span className="action__hint">Origen, destino y carga</span></span>
-          <ChevronRightIcon className="action__go" />
-        </button>
-        <button className="action" onClick={() => go('profile')}>
-          <IdCardIcon className="action__icon" />
-          <span><span className="action__title">Perfil conductor</span><span className="action__hint">Tus datos y tu empresa</span></span>
-        </button>
-        <button className="action action--ok" onClick={() => go('pass')}>
-          <QrIcon className="action__icon" />
-          <span><span className="action__title">Pase de validación</span><span className="action__hint">{wait === null ? 'Espera y código QR' : `Espera aprox. ${wait} min`}</span></span>
-        </button>
-      </div>
-      <button className="link-btn" onClick={() => go('about')}>Acerca de</button>
     </Shell>
   );
 }
@@ -246,15 +250,23 @@ function Pass({ session, go, back }) {
   );
 }
 
+// La navegación usa el historial del navegador: el botón atrás (de la app, del navegador o de Android) vuelve a la pantalla anterior.
 export default function App() {
   const [session, setSession] = useState(load());
-  const [screen, setScreen] = useState('home');
-  const back = () => setScreen('home');
+  const [screen, setScreen] = useState(() => window.history.state?.screen ?? 'home');
+  useEffect(() => {
+    window.history.replaceState({ screen }, '');
+    const onPop = (e) => setScreen(e.state?.screen ?? 'home');
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const go = (s) => { window.history.pushState({ screen: s }, ''); setScreen(s); };
+  const back = () => (window.history.state?.screen && window.history.state.screen !== 'home' ? window.history.back() : setScreen('home'));
+  const logout = () => { localStorage.removeItem(SESSION); setSession(null); window.history.replaceState({ screen: 'home' }, ''); setScreen('home'); };
   if (screen === 'about') return <About back={back} />;
-  if (!session) return <Login onLogin={setSession} onAbout={() => setScreen('about')} />;
-  const logout = () => { localStorage.removeItem(SESSION); setSession(null); setScreen('home'); };
+  if (!session) return <Login onLogin={setSession} onAbout={() => go('about')} />;
   if (screen === 'profile') return <Profile session={session} back={back} />;
   if (screen === 'trip') return <Trip session={session} back={back} />;
-  if (screen === 'pass') return <Pass session={session} go={setScreen} back={back} />;
-  return <Home session={session} go={setScreen} logout={logout} />;
+  if (screen === 'pass') return <Pass session={session} go={go} back={back} />;
+  return <Home session={session} go={go} logout={logout} />;
 }

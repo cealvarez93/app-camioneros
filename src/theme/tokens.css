@@ -55,6 +55,8 @@
   /* Tarjeta destacada del inicio */
   --hero-overlay: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.9) 100%);
   --hero-height: 11rem;
+  --hero-overlay-fill: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.05) 32%, rgba(2, 6, 23, 0.45) 62%, rgba(2, 6, 23, 0.94) 100%);
+  --color-surface-glass: rgba(15, 23, 42, 0.72);
   --hero-image: none; /* la pantalla de inicio la sobrescribe con la imagen de marca */
 
   /* Forma */

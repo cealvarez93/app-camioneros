@@ -101,6 +101,6 @@ export function PasswordField(props) {
   );
 }
 
-export function Button({ icon: Icon, iconStart: IconStart, large, children, ...props }) {
-  return <button className={`btn${large ? ' btn--lg' : ''}`} {...props}>{IconStart && <IconStart />}<span>{children}</span>{Icon && <Icon />}</button>;
+export function Button({ icon: Icon, iconStart: IconStart, large, variant, children, ...props }) {
+  return <button className={`btn${large ? ' btn--lg' : ''}${variant ? ` btn--${variant}` : ''}`} {...props}>{IconStart && <IconStart />}<span>{children}</span>{Icon && <Icon />}</button>;
 }

@@ -74,6 +74,10 @@
   --gradient-brand: linear-gradient(90deg, var(--color-brand), var(--color-brand-strong));
   --gradient-page: radial-gradient(circle at 50% 0%, var(--brand-glow) 0%, var(--color-bg) 75%);
 
+  --gradient-raised: linear-gradient(180deg, #1c222c 0%, #151920 100%);
+  --gradient-avatar: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  --color-avatar-ring: rgba(239, 68, 68, 0.4);
+
   /* Tipografía */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --text-2xs: 0.6875rem;

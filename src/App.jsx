@@ -3,7 +3,8 @@ import QRCode from 'qrcode';
 import { api } from './api.js';
 import { brand } from './brand.js';
 import { buildQrPayload } from './qr.js';
-import { ArrowIcon, BoxIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, MapPinIcon, NavigationIcon, QrIcon, StackIcon, SwapIcon, TruckIcon, UserIcon, WheelIcon } from './icons.jsx';
+import { formatRut, iniciales } from './format.js';
+import { ArrowIcon, BoxIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
 import { Button, Card, Field, PasswordField, SectionCard, Shell } from './ui.jsx';
 import hero from './assets/bg3.jpg';
 
@@ -92,13 +93,38 @@ function Profile({ session, back }) {
   const [p, setP] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => { api.profile(session.driverId).then(setP).catch(() => setErr('No se pudo cargar el perfil')); }, [session.driverId]);
-  const rows = p ? [['Nombre', p.Drv_Name], ['Empresa', p.Drv_Company], ['RUT', p.Drv_UserId], ['Teléfono', p.Drv_Phone], ['Correo', p.Drv_Mail]] : [];
+  const rows = p ? [
+    ['Nombre', p.Drv_Name, UserCircleIcon],
+    ['Empresa', p.Drv_Company, BuildingIcon],
+    ['RUT', formatRut(p.Drv_UserId), IdCardIcon, true],
+    ['Teléfono', p.Drv_Phone, PhoneIcon, true],
+    ['Correo electrónico', p.Drv_Mail, MailIcon],
+  ] : [];
   return (
     <Shell title="Perfil conductor" titleIcon={IdCardIcon} onBack={back}>
-      <Card>
-        {err && <p className="msg msg--error">{err}</p>}
-        <dl className="profile">{rows.map(([k, v]) => <div className="profile__row" key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
-      </Card>
+      {err && <p className="msg msg--error">{err}</p>}
+      {p && (
+        <>
+          <section className="identity">
+            <div className="avatar" aria-hidden="true">{iniciales(p.Drv_Name)}</div>
+            <div>
+              <h2 className="identity__name">{p.Drv_Name}</h2>
+              <p className="identity__company">{p.Drv_Company}</p>
+            </div>
+          </section>
+          <ul className="list">
+            {rows.map(([label, value, Icon, mono]) => (
+              <li className="list__row" key={label}>
+                <Icon className="list__icon" />
+                <div className="list__text">
+                  <p className="list__label">{label}</p>
+                  <p className={`list__value${mono ? ' list__value--mono' : ''}${value ? '' : ' list__value--empty'}`}>{value || 'Sin registrar'}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </Shell>
   );
 }

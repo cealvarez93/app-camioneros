@@ -23,3 +23,7 @@ export const StackIcon = make(<path d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5M3 16l
 export const SwapIcon = make(<path d="M7 7h13m-4-4l4 4-4 4M17 17H4m4 4l-4-4 4-4" />);
 export const CheckCircleIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></>);
 export const WheelIcon = make(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="2" /><path d="M12 14v7M10 11L4 9m10 2l6-2" /></>);
+export const UserCircleIcon = make(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="10" r="3" /><path d="M6.2 18.5c1.3-2 3.100-3 5.800-3s4.500 1 5.800 3" /></>);
+export const BuildingIcon = make(<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />);
+export const PhoneIcon = make(<path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />);
+export const MailIcon = make(<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />);

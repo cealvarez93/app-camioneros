@@ -4,8 +4,8 @@ import { api } from './api.js';
 import { brand } from './brand.js';
 import { buildQrPayload } from './qr.js';
 import { formatRut, iniciales } from './format.js';
-import { ArrowIcon, BoxIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, InfoIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, RefreshIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
-import { Button, Card, Field, PasswordField, SectionCard, Shell } from './ui.jsx';
+import { ArrowIcon, BoxIcon, HomeIcon, LogoutIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, InfoIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, RefreshIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
+import { Button, Card, Field, MenuContext, PasswordField, SectionCard, Shell } from './ui.jsx';
 import hero from './assets/bg3.jpg';
 
 const PALLETS = Array.from({ length: 30 }, (_, i) => String(i + 1));
@@ -45,7 +45,7 @@ function Login({ onLogin, onAbout }) {
   );
 }
 
-function Home({ session, go, logout }) {
+function Home({ session, go }) {
   const [trip, setTrip] = useState(null);
   const [wait, setWait] = useState(null);
   useEffect(() => {
@@ -53,37 +53,31 @@ function Home({ session, go, logout }) {
     api.queue().then((c) => setWait((c?.QuantityTrucks ?? 0) * (c?.Minutesxtruck ?? 0))).catch(() => {});
   }, [session.driverId]);
   return (
-    <Shell onLogout={logout}>
+    <Shell>
       <section className="hero hero--fill" style={{ '--hero-image': `url(${hero})` }}>
-        <div className="hero__head">
-          <div className="hero__top">
-            {trip && <span className="chip chip--ok"><span className="chip__dot" />Viaje registrado</span>}
-            {trip && <span className="chip chip--mono">{trip.Truck}</span>}
-          </div>
+        <div>
           {trip && (
-            <div>
-              <h2 className="hero__route">{trip.Origin} → {trip.Destination}</h2>
-              <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>
+            <div className="status-card">
+              <MapPinIcon className="status-card__icon" />
+              <span className="status-card__route">{trip.Origin} → {trip.Destination}</span>
+              <span className="chip chip--mono">{trip.Truck}</span>
             </div>
           )}
         </div>
-        <div className="hero__bottom">
-          <div className="actions">
-            <button className="action action--primary" onClick={() => go('trip')}>
-              <TruckIcon className="action__icon" />
-              <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span></span>
-              <ChevronRightIcon className="action__go" />
-            </button>
-            <button className="action" onClick={() => go('profile')}>
-              <IdCardIcon className="action__icon" />
-              <span><span className="action__title">Perfil conductor</span></span>
-            </button>
-            <button className="action action--ok" onClick={() => go('pass')}>
-              <QrIcon className="action__icon" />
-              <span><span className="action__title">Pase de validación</span>{wait !== null && <span className="action__hint">{`Espera aprox. ${wait} min`}</span>}</span>
-            </button>
-          </div>
-          <button className="link-btn" onClick={() => go('about')}>Acerca de</button>
+        <div className="actions">
+          <button className="action action--primary" onClick={() => go('trip')}>
+            <TruckIcon className="action__icon" />
+            <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span></span>
+            <span className="action__go"><ChevronRightIcon /></span>
+          </button>
+          <button className="action" onClick={() => go('profile')}>
+            <span className="action__top"><IdCardIcon className="action__icon" /></span>
+            <span className="action__title">Perfil conductor</span>
+          </button>
+          <button className="action action--ok" onClick={() => go('pass')}>
+            <span className="action__top"><QrIcon className="action__icon" />{wait !== null && <span className="chip chip--ok">{wait} min</span>}</span>
+            <span className="action__title">Pase de validación</span>
+          </button>
         </div>
       </section>
     </Shell>
@@ -255,10 +249,21 @@ export default function App() {
   const go = (s) => { window.history.pushState({ screen: s }, ''); setScreen(s); };
   const back = () => (window.history.state?.screen && window.history.state.screen !== 'home' ? window.history.back() : setScreen('home'));
   const logout = () => { localStorage.removeItem(SESSION); setSession(null); window.history.replaceState({ screen: 'home' }, ''); setScreen('home'); };
-  if (screen === 'about') return <About back={back} />;
-  if (!session) return <Login onLogin={setSession} onAbout={() => go('about')} />;
-  if (screen === 'profile') return <Profile session={session} back={back} />;
-  if (screen === 'trip') return <Trip session={session} back={back} />;
-  if (screen === 'pass') return <Pass session={session} go={go} back={back} />;
-  return <Home session={session} go={go} logout={logout} />;
+  const menu = [
+    { label: 'Inicio', icon: HomeIcon, current: screen === 'home', onClick: () => screen !== 'home' && go('home') },
+    { label: 'Viaje', icon: TruckIcon, current: screen === 'trip', onClick: () => go('trip') },
+    { label: 'Perfil conductor', icon: IdCardIcon, current: screen === 'profile', onClick: () => go('profile') },
+    { label: 'Pase de validación', icon: QrIcon, current: screen === 'pass', onClick: () => go('pass') },
+    { label: 'Acerca de', icon: InfoIcon, current: screen === 'about', onClick: () => go('about') },
+    { label: 'Cerrar sesión', icon: LogoutIcon, danger: true, separated: true, onClick: logout },
+  ];
+  const view = (() => {
+    if (screen === 'about') return <About back={back} />;
+    if (!session) return <Login onLogin={setSession} onAbout={() => go('about')} />;
+    if (screen === 'profile') return <Profile session={session} back={back} />;
+    if (screen === 'trip') return <Trip session={session} back={back} />;
+    if (screen === 'pass') return <Pass session={session} go={go} back={back} />;
+    return <Home session={session} go={go} />;
+  })();
+  return <MenuContext.Provider value={session ? menu : []}>{view}</MenuContext.Provider>;
 }

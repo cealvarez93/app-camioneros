@@ -29,3 +29,4 @@ export const PhoneIcon = make(<path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.
 export const MailIcon = make(<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />);
 export const RefreshIcon = make(<path d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 006.5 6.5L4 10m16 4l-2.500 3.500A8 8 0 014 15" />);
 export const InfoIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5m0-8h.01" /></>);
+export const HomeIcon = make(<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" />);

@@ -1,7 +1,7 @@
 // Componentes de interfaz. Solo clases del tema (src/theme); textos de marca desde brand.js.
-import { useEffect, useId, useState } from 'react';
+import { createContext, useContext, useEffect, useId, useState } from 'react';
 import { brand } from './brand.js';
-import { ChevronDownIcon, ChevronLeftIcon, EyeIcon, EyeOffIcon, LockIcon, LogoutIcon } from './icons.jsx';
+import { ChevronDownIcon, ChevronLeftIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.jsx';
 import logo from './assets/logo3.png';
 import partner from './assets/sbi.jpg';
 
@@ -31,8 +31,43 @@ export function AppFooter() {
   );
 }
 
-// variant "light": header blanco con logo centrado (login). "dark": logo en chip blanco, estado o salir a la derecha y barra de pantalla.
-export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, onLogout, top = true, children }) {
+export const MenuContext = createContext([]);
+
+function MenuButton() {
+  const items = useContext(MenuContext);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+  if (!items.length) return null;
+  return (
+    <div className="menu">
+      <button className="menu__btn" aria-label="Abrir menú" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <span /><span /><span />
+      </button>
+      {open && (
+        <>
+          <div className="menu__backdrop" onClick={() => setOpen(false)} />
+          <div className="menu__panel" role="menu">
+            {items.map((it) => (
+              <div key={it.label} className={it.separated ? 'menu__sep' : undefined}>
+                <button role="menuitem" className={`menu__item${it.danger ? ' menu__item--danger' : ''}`} aria-current={it.current ? 'page' : undefined} onClick={() => { setOpen(false); it.onClick(); }}>
+                  <it.icon />{it.label}
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// variant "light": header blanco con logo centrado (login). "dark": header delgado con logo, estado y menú, más barra de pantalla.
+export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, top = true, children }) {
   return (
     <div className={`app${top ? ' app--top' : ''}`}>
       {variant === 'light' ? (
@@ -40,10 +75,8 @@ export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, o
       ) : (
         <header className="app-header app-header--dark">
           <div className="app-header__row">
-            <span className="app-header__logo"><img src={logo} alt={brand.clientName} style={{ height: '100%' }} /></span>
-            {onLogout
-              ? <button className="app-header__action" onClick={onLogout}><LogoutIcon width="14" height="14" />Salir</button>
-              : <OnlineChip />}
+            <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
+            <div className="app-header__end"><OnlineChip /><MenuButton /></div>
           </div>
           {title && (
             <div className="screen-bar">

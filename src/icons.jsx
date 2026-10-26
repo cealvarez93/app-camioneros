@@ -1,0 +1,25 @@
+// Íconos de trazo; heredan el color con currentColor.
+const base = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true };
+const make = (d) => (props) => <svg {...base} {...props}>{d}</svg>;
+
+export const TruckIcon = make(<path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />);
+export const UserIcon = make(<><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0116 0" /></>);
+export const LockIcon = make(<><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></>);
+export const EyeIcon = make(<><path d="M2.5 12C4 7.9 7.7 5 12 5s8 2.9 9.5 7c-1.5 4.1-5.2 7-9.5 7s-8-2.9-9.5-7z" /><circle cx="12" cy="12" r="3" /></>);
+export const EyeOffIcon = make(<><path d="M3 3l18 18" /><path d="M10.6 5.1A9.7 9.7 0 0112 5c4.3 0 8 2.9 9.5 7a10 10 0 01-2.2 3.4M6.6 6.6A10 10 0 002.5 12c1.5 4.1 5.2 7 9.5 7a9.6 9.6 0 004.4-1.1M9.9 9.9a3 3 0 004.2 4.2" /></>);
+export const ArrowIcon = make(<path d="M5 12h14m-6-6l6 6-6 6" />);
+export const ChevronRightIcon = make(<path d="M9 5l7 7-7 7" />);
+export const ChevronDownIcon = make(<path d="M6 9l6 6 6-6" />);
+export const LogoutIcon = make(<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />);
+export const IdCardIcon = make(<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M14 10h4M14 14h3" /></>);
+export const ClockIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>);
+export const QrIcon = make(<><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h3v3m3 0v3h-4m-2-3v3" /></>);
+export const ChevronLeftIcon = make(<path d="M15 5l-7 7 7 7" />);
+export const MapPinIcon = make(<><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>);
+export const FlagIcon = make(<path d="M5 21V4m0 0h11l-2 4 2 4H5" />);
+export const NavigationIcon = make(<path d="M4 11l16-7-7 16-2-7-7-2z" />);
+export const BoxIcon = make(<><path d="M4 7l8-4 8 4v10l-8 4-8-4V7z" /><path d="M4 7l8 4 8-4M12 11v10" /></>);
+export const StackIcon = make(<path d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5M3 16l9 5 9-5" />);
+export const SwapIcon = make(<path d="M7 7h13m-4-4l4 4-4 4M17 17H4m4 4l-4-4 4-4" />);
+export const CheckCircleIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></>);
+export const WheelIcon = make(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="2" /><path d="M12 14v7M10 11L4 9m10 2l6-2" /></>);

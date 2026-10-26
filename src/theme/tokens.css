@@ -1,0 +1,104 @@
+/* Tokens de diseño. Único archivo con valores de color; el resto del CSS solo usa var(--…).
+   Para otro cliente o variante: agregar un bloque [data-theme="nombre"] que sobrescriba lo necesario. */
+:root,
+[data-theme="ecsa"] {
+  /* Marca */
+  --color-brand: #e41e2b;
+  --color-brand-strong: #b8131f;
+  --color-brand-soft: #ff3b47;
+  --color-brand-tint: #fecaca;
+  --color-on-brand: #ffffff;
+  --brand-glow: rgba(228, 30, 43, 0.12);
+  --brand-shadow: rgba(228, 30, 43, 0.3);
+  --brand-border: rgba(248, 113, 113, 0.3);
+  --brand-focus-ring: rgba(228, 30, 43, 0.3);
+
+  /* Superficies y texto */
+  --color-bg: #0b0d12;
+  --color-surface: rgba(15, 23, 42, 0.9);
+  --color-surface-sunken: rgba(2, 6, 23, 0.7);
+  --color-surface-solid: #0f172a;
+  --color-footer-bg: rgba(2, 6, 23, 0.85);
+  --color-border: rgba(30, 41, 59, 0.85);
+  --color-border-input: rgba(51, 65, 85, 0.85);
+  --color-text: #f1f5f9;
+  --color-text-label: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-placeholder: #64748b;
+  --color-header-bg: #ffffff;
+  --color-header-border: #e2e8f0;
+  --color-header-dark-bg: rgba(11, 13, 18, 0.92);
+  --color-overlay: rgba(2, 6, 23, 0.55);
+  --color-chip-bg: #ffffff;
+  --color-glass: rgba(255, 255, 255, 0.12);
+  --color-glass-border: rgba(255, 255, 255, 0.25);
+
+  /* Estados */
+  --color-danger: #fca5a5;
+  --color-success: #86efac;
+  --color-success-strong: #34d399;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-muted-bg: rgba(30, 41, 59, 0.8);
+
+  /* Tonos de los módulos del inicio */
+  --tone-info: #60a5fa;
+  --tone-info-bg: rgba(59, 130, 246, 0.1);
+  --tone-info-border: rgba(59, 130, 246, 0.25);
+  --tone-warn: #fbbf24;
+  --tone-warn-bg: rgba(245, 158, 11, 0.1);
+  --tone-warn-border: rgba(245, 158, 11, 0.25);
+  --tone-ok: #34d399;
+  --tone-ok-bg: rgba(16, 185, 129, 0.1);
+  --tone-ok-border: rgba(16, 185, 129, 0.25);
+
+  /* Tarjeta destacada del inicio */
+  --hero-overlay: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.9) 100%);
+  --hero-height: 11rem;
+  --hero-image: none; /* la pantalla de inicio la sobrescribe con la imagen de marca */
+
+  /* Forma */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-pill: 999px;
+
+  /* Sombras */
+  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  --shadow-header: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+  --shadow-brand: 0 10px 25px -5px var(--brand-shadow);
+  --shadow-round: 0 2px 8px rgba(0, 0, 0, 0.55);
+
+  /* Gradientes */
+  --gradient-brand: linear-gradient(90deg, var(--color-brand), var(--color-brand-strong));
+  --gradient-page: radial-gradient(circle at 50% 0%, var(--brand-glow) 0%, var(--color-bg) 75%);
+
+  /* Tipografía */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+  --tracking-label: 0.08em;
+  --tracking-title: 0.04em;
+
+  /* Espaciado y layout */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --content-max: 28rem;
+  --header-height: 4rem;
+  --control-height: 3.25rem;
+  --transition: 200ms ease;
+}

@@ -14,7 +14,6 @@ export const LogoutIcon = make(<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01
 export const IdCardIcon = make(<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M14 10h4M14 14h3" /></>);
 export const ClockIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>);
 export const QrIcon = make(<><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h3v3m3 0v3h-4m-2-3v3" /></>);
-export const ChevronLeftIcon = make(<path d="M15 5l-7 7 7 7" />);
 export const MapPinIcon = make(<><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>);
 export const FlagIcon = make(<path d="M5 21V4m0 0h11l-2 4 2 4H5" />);
 export const NavigationIcon = make(<path d="M4 11l16-7-7 16-2-7-7-2z" />);

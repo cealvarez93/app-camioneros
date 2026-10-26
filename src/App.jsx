@@ -83,7 +83,7 @@ function Home({ session, go }) {
   );
 }
 
-function About({ back }) {
+function About() {
   const rows = [
     ['Aplicación', brand.appName, TruckIcon],
     ['Versión', brand.version.replace(/^v/, ''), InfoIcon],
@@ -91,7 +91,7 @@ function About({ back }) {
     ['Desarrollado por', brand.partnerName, UserCircleIcon],
   ];
   return (
-    <Shell title="Acerca de" titleIcon={InfoIcon} onBack={back}>
+    <Shell title="Acerca de" titleIcon={InfoIcon}>
       <ul className="list">
         {rows.map(([label, value, Icon]) => (
           <li className="list__row" key={label}>
@@ -104,7 +104,7 @@ function About({ back }) {
   );
 }
 
-function Profile({ session, back }) {
+function Profile({ session }) {
   const [p, setP] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => { api.profile(session.driverId).then(setP).catch(() => setErr('No se pudo cargar el perfil')); }, [session.driverId]);
@@ -116,7 +116,7 @@ function Profile({ session, back }) {
     ['Correo electrónico', p.Drv_Mail, MailIcon],
   ] : [];
   return (
-    <Shell title="Perfil conductor" titleIcon={IdCardIcon} onBack={back}>
+    <Shell title="Perfil conductor" titleIcon={IdCardIcon}>
       {err && <p className="msg msg--error">{err}</p>}
       {p && (
         <>
@@ -144,7 +144,7 @@ function Profile({ session, back }) {
   );
 }
 
-function Trip({ session, back }) {
+function Trip({ session }) {
   const [lists, setLists] = useState({ o: [], d: [], op: [] });
   const [f, setF] = useState({ Origin: '', Destination: '', Truck: localStorage.getItem('logistic.truck') || '', Trailer: localStorage.getItem('logistic.trailer') || '', Pallet: '', OperaPon: '' });
   const [msg, setMsg] = useState(null);
@@ -166,7 +166,7 @@ function Trip({ session, back }) {
   };
   const options = (items, name) => items.map((i) => <option key={i[name]}>{i[name]}</option>);
   return (
-    <Shell title="Inicio de viaje" titleIcon={TruckIcon} onBack={back}>
+    <Shell title="Inicio de viaje" titleIcon={TruckIcon}>
       <SectionCard icon={NavigationIcon} title="Ruta de despacho">
         <Field as="select" label="Origen" labelIcon={MapPinIcon} tone="ok" required mark value={f.Origin} onChange={set('Origin')}>
           <option value="">Seleccione origen</option>{options(lists.o, 'Loc_Name')}
@@ -193,7 +193,7 @@ function Trip({ session, back }) {
   );
 }
 
-function Pass({ session, go, back }) {
+function Pass({ session, go }) {
   const [st, setSt] = useState({ loading: true });
   const cargar = useCallback(async () => {
     setSt((s) => ({ ...s, loading: true }));
@@ -209,7 +209,7 @@ function Pass({ session, go, back }) {
   const wait = trucks === null || trucks === undefined ? null : trucks * perTruck;
   const facts = trip ? [['Tracto', trip.Truck, true], ['Remolque', trip.Trailer, true], ['Destino', trip.Destination], ['Carga', `${trip.Pallet} pallets · ${trip.OperaPon}`]] : [];
   return (
-    <Shell title="Pase de validación" titleIcon={QrIcon} onBack={back}>
+    <Shell title="Pase de validación" titleIcon={QrIcon}>
       <SectionCard icon={ClockIcon} title="Tiempo de espera estimado">
         {wait === null
           ? <p className="msg">{loading ? 'Calculando…' : 'Sin estimación disponible'}</p>
@@ -235,7 +235,7 @@ function Pass({ session, go, back }) {
   );
 }
 
-// La navegación usa el historial del navegador: el botón atrás (de la app, del navegador o de Android) vuelve a la pantalla anterior.
+// La navegación usa el historial del navegador: el botón atrás del navegador o de Android vuelve a la pantalla anterior.
 export default function App() {
   const [session, setSession] = useState(load());
   const [screen, setScreen] = useState(() => window.history.state?.screen ?? 'home');
@@ -246,7 +246,6 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const go = (s) => { window.history.pushState({ screen: s }, ''); setScreen(s); };
-  const back = () => (window.history.state?.screen && window.history.state.screen !== 'home' ? window.history.back() : setScreen('home'));
   const logout = () => { localStorage.removeItem(SESSION); setSession(null); window.history.replaceState({ screen: 'home' }, ''); setScreen('home'); };
   const menu = [
     { label: 'Inicio', icon: HomeIcon, current: screen === 'home', onClick: () => screen !== 'home' && go('home') },
@@ -257,11 +256,11 @@ export default function App() {
     { label: 'Cerrar sesión', icon: LogoutIcon, danger: true, separated: true, onClick: logout },
   ];
   const view = (() => {
-    if (screen === 'about') return <About back={back} />;
+    if (screen === 'about') return <About />;
     if (!session) return <Login onLogin={setSession} />;
-    if (screen === 'profile') return <Profile session={session} back={back} />;
-    if (screen === 'trip') return <Trip session={session} back={back} />;
-    if (screen === 'pass') return <Pass session={session} go={go} back={back} />;
+    if (screen === 'profile') return <Profile session={session} />;
+    if (screen === 'trip') return <Trip session={session} />;
+    if (screen === 'pass') return <Pass session={session} go={go} />;
     return <Home session={session} go={go} />;
   })();
   const publicMenu = menu.filter((it) => it.label === 'Acerca de');

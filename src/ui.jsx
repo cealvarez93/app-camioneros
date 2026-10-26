@@ -1,26 +1,9 @@
 // Componentes de interfaz. Solo clases del tema (src/theme); textos de marca desde brand.js.
 import { createContext, useContext, useEffect, useId, useState } from 'react';
 import { brand } from './brand.js';
-import { ChevronDownIcon, ChevronLeftIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.jsx';
+import { ChevronDownIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.jsx';
 import logo from './assets/logo3.png';
 import partner from './assets/sbi.jpg';
-
-export function useOnline() {
-  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener('online', on);
-    window.addEventListener('offline', off);
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
-  }, []);
-  return online;
-}
-
-export function OnlineChip() {
-  const online = useOnline();
-  return <span className={`chip${online ? ' chip--ok' : ''}`}><span className="chip__dot" />{online ? 'En línea' : 'Sin conexión'}</span>;
-}
 
 export function AppFooter() {
   return (
@@ -66,22 +49,14 @@ function MenuButton() {
   );
 }
 
-// Header único (logo, estado y menú) para todas las pantallas; las internas suman la barra con atrás y título.
-export function Shell({ title, titleIcon: TitleIcon, onBack, top = true, children }) {
+// Header único de una sola fila: logo, título de la pantalla y menú.
+export function Shell({ title, titleIcon: TitleIcon, top = true, children }) {
   return (
     <div className={`app${top ? ' app--top' : ''}`}>
       <header className="app-header">
-        <div className="app-header__row">
-          <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
-          <div className="app-header__end"><OnlineChip /><MenuButton /></div>
-        </div>
-        {title && (
-          <div className="screen-bar">
-            <button className="icon-btn" onClick={onBack} aria-label="Volver"><ChevronLeftIcon /></button>
-            <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>
-            <span className="screen-bar__spacer" />
-          </div>
-        )}
+        <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
+        {title && <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>}
+        <MenuButton />
       </header>
       <main className="app__main">{children}</main>
       <AppFooter />

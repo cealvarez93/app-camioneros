@@ -62,12 +62,11 @@ export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, o
 
 export const Card = ({ className = '', ...p }) => <section className={`card ${className}`} {...p} />;
 
-export function SectionCard({ icon: Icon, title, hint, children }) {
+export function SectionCard({ icon: Icon, title, children }) {
   return (
     <section className="card card--section">
       <div className="card__head">
         <h2 className="card__title">{Icon && <Icon />}{title}</h2>
-        {hint && <span className="card__hint">{hint}</span>}
       </div>
       {children}
     </section>

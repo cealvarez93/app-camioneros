@@ -32,7 +32,6 @@ function Login({ onLogin, onAbout }) {
   return (
     <Shell variant="light" top={false}>
       <div className="badge"><TruckIcon />{brand.appName}</div>
-      <p className="tagline">{brand.tagline}</p>
       <Card>
         <form onSubmit={submit} className="stack">
           <Field label="Usuario" icon={UserIcon} value={user} onChange={(e) => setUser(e.target.value)} autoComplete="username" placeholder="Ingresa tu ID de usuario" required />
@@ -61,27 +60,27 @@ function Home({ session, go, logout }) {
             {trip && <span className="chip chip--ok"><span className="chip__dot" />Viaje registrado</span>}
             {trip && <span className="chip chip--mono">{trip.Truck}</span>}
           </div>
-          <div>
-            <p className="hero__label">{trip ? 'Ruta asignada' : 'Viaje'}</p>
-            <h2 className="hero__route">{trip ? `${trip.Origin} → ${trip.Destination}` : 'Registra tu viaje para generar el QR'}</h2>
-            {trip && <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>}
-          </div>
+          {trip && (
+            <div>
+              <h2 className="hero__route">{trip.Origin} → {trip.Destination}</h2>
+              <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>
+            </div>
+          )}
         </div>
         <div className="hero__bottom">
-          <div className="section-head"><h2>Operaciones rápidas</h2></div>
           <div className="actions">
             <button className="action action--primary" onClick={() => go('trip')}>
               <TruckIcon className="action__icon" />
-              <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span><span className="action__hint">Origen, destino y carga</span></span>
+              <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span></span>
               <ChevronRightIcon className="action__go" />
             </button>
             <button className="action" onClick={() => go('profile')}>
               <IdCardIcon className="action__icon" />
-              <span><span className="action__title">Perfil conductor</span><span className="action__hint">Tus datos y tu empresa</span></span>
+              <span><span className="action__title">Perfil conductor</span></span>
             </button>
             <button className="action action--ok" onClick={() => go('pass')}>
               <QrIcon className="action__icon" />
-              <span><span className="action__title">Pase de validación</span><span className="action__hint">{wait === null ? 'Espera y código QR' : `Espera aprox. ${wait} min`}</span></span>
+              <span><span className="action__title">Pase de validación</span>{wait !== null && <span className="action__hint">{`Espera aprox. ${wait} min`}</span>}</span>
             </button>
           </div>
           <button className="link-btn" onClick={() => go('about')}>Acerca de</button>
@@ -175,7 +174,7 @@ function Trip({ session, back }) {
   const options = (items, name) => items.map((i) => <option key={i[name]}>{i[name]}</option>);
   return (
     <Shell title="Inicio de viaje" titleIcon={TruckIcon} onBack={back}>
-      <SectionCard icon={NavigationIcon} title="Ruta de despacho" hint="Origen y destino">
+      <SectionCard icon={NavigationIcon} title="Ruta de despacho">
         <Field as="select" label="Origen" labelIcon={MapPinIcon} tone="ok" required mark value={f.Origin} onChange={set('Origin')}>
           <option value="">Seleccione origen</option>{options(lists.o, 'Loc_Name')}
         </Field>
@@ -183,7 +182,7 @@ function Trip({ session, back }) {
           <option value="">Seleccione destino</option>{options(lists.d, 'Loc_Name')}
         </Field>
       </SectionCard>
-      <SectionCard icon={TruckIcon} title="Equipo y carga" hint="Identificación">
+      <SectionCard icon={TruckIcon} title="Equipo y carga">
         <div className="grid-2">
           <Field label="Tracto" labelIcon={WheelIcon} mono required mark mark value={f.Truck} onChange={plate('Truck')} placeholder="Ej: ABCD12" autoCapitalize="characters" />
           <Field label="Remolque" labelIcon={BoxIcon} mono required mark mark value={f.Trailer} onChange={plate('Trailer')} placeholder="Ej: ABCD12" autoCapitalize="characters" />
@@ -196,10 +195,7 @@ function Trip({ session, back }) {
         </Field>
       </SectionCard>
       {msg && <p className={`msg ${msg.err ? 'msg--error' : 'msg--ok'}`} role="status">{msg.text}</p>}
-      <div>
-        <Button large iconStart={CheckCircleIcon} onClick={save}>Confirmar viaje</Button>
-        <p className="note">Al confirmar, tu QR queda listo para mostrarlo al portero.</p>
-      </div>
+      <Button large iconStart={CheckCircleIcon} onClick={save}>Confirmar viaje</Button>
     </Shell>
   );
 }
@@ -222,14 +218,11 @@ function Pass({ session, go, back }) {
   return (
     <Shell title="Pase de validación" titleIcon={QrIcon} onBack={back}>
       <SectionCard icon={ClockIcon} title="Tiempo de espera estimado">
-        {wait === null ? <p className="msg">{loading ? 'Calculando…' : 'Sin estimación disponible'}</p> : (
-          <>
-            <div className="metric"><span className="metric__value">{wait}</span><span className="metric__unit">minutos</span></div>
-            <p className="note">{trucks} camiones en cola · {perTruck} min por camión</p>
-          </>
-        )}
+        {wait === null
+          ? <p className="msg">{loading ? 'Calculando…' : 'Sin estimación disponible'}</p>
+          : <div className="metric"><span className="metric__value">{wait}</span><span className="metric__unit">minutos</span></div>}
       </SectionCard>
-      <SectionCard icon={QrIcon} title="Código QR" hint="Válido hoy">
+      <SectionCard icon={QrIcon} title="Código QR">
         {error && <p className="msg msg--error">{error}</p>}
         {!error && !loading && !trip && (
           <>
@@ -240,7 +233,6 @@ function Pass({ session, go, back }) {
         {trip && qr && (
           <>
             <div className="qr-frame"><img src={qr} alt="Código QR del viaje" /><i /><i /><i /><i /></div>
-            <p className="qr-caption">Muestra este código al portero.</p>
             <dl className="facts">{facts.map(([k, v, mono]) => <div key={k}><dt>{k}</dt><dd className={mono ? 'facts__mono' : ''}>{v}</dd></div>)}</dl>
           </>
         )}

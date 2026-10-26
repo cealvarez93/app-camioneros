@@ -50,11 +50,12 @@ function git(dir, token, ...args) {
 }
 
 function publicar({ owner, repo, assetsRepo, token }) {
-  let codigo = readFileSync('CODEOWNERS', 'utf8');
-  if (codigo.includes('__OWNER__')) {
-    writeFileSync('CODEOWNERS', codigo.replaceAll('__OWNER__', owner));
+  const codigo = readFileSync('CODEOWNERS', 'utf8');
+  if (codigo.includes('__OWNER__')) writeFileSync('CODEOWNERS', codigo.replaceAll('__OWNER__', owner));
+  if (execFileSync('git', ['status', '--porcelain', 'CODEOWNERS']).toString().trim()) {
     execFileSync('git', ['add', 'CODEOWNERS']);
-    execFileSync('git', ['commit', '-m', 'CODEOWNERS con el dueño del repo']);
+    // El correo noreply de GitHub evita publicar el correo personal en el historial del repo público.
+    execFileSync('git', ['-c', `user.name=${owner}`, '-c', `user.email=${owner}@users.noreply.github.com`, 'commit', '-m', 'CODEOWNERS con el dueño del repo']);
   }
   execFileSync('git', ['branch', '-M', 'main']);
   for (const [dir, nombre, ramas] of [['.', repo, ['main:main', 'main:qa']], ['../app-camioneros-assets', assetsRepo, ['HEAD:refs/heads/main']]]) {
@@ -72,8 +73,8 @@ async function main() {
   for (const p of pasos) {
     if (p.git) { publicar({ owner, repo: 'app-camioneros', assetsRepo: 'app-camioneros-assets', token }); console.log(`ok  ${p.que}`); continue; }
     const r = await fetch(`https://api.github.com${p.ruta}`, { method: p.metodo, headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json', 'content-type': 'application/json', 'user-agent': 'logistic-setup' }, body: JSON.stringify(p.cuerpo) });
-    console.log(`${r.ok ? 'ok ' : 'ERR'} ${p.que} (${r.status})`);
-    if (!r.ok && r.status !== 422) { console.error(await r.text()); process.exit(1); }
+    console.log(`${r.ok ? 'ok ' : [409, 422].includes(r.status) ? 'ya ' : 'ERR'} ${p.que} (${r.status})`);
+    if (!r.ok && ![409, 422].includes(r.status)) { console.error(await r.text()); process.exit(1); }
   }
   console.log(`\nPendiente manual (los secretos no pasan por este script):
 1. Cloudflare: crear proyectos  npx wrangler pages project create logistic-qa --production-branch=main  y  logistic-prod

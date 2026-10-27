@@ -14,7 +14,6 @@ export const LogoutIcon = make(<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01
 export const IdCardIcon = make(<><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="11" r="2" /><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M14 10h4M14 14h3" /></>);
 export const ClockIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></>);
 export const QrIcon = make(<><rect x="4" y="4" width="6" height="6" rx="1" /><rect x="14" y="4" width="6" height="6" rx="1" /><rect x="4" y="14" width="6" height="6" rx="1" /><path d="M14 14h3v3m3 0v3h-4m-2-3v3" /></>);
-export const ChevronLeftIcon = make(<path d="M15 5l-7 7 7 7" />);
 export const MapPinIcon = make(<><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" /></>);
 export const FlagIcon = make(<path d="M5 21V4m0 0h11l-2 4 2 4H5" />);
 export const NavigationIcon = make(<path d="M4 11l16-7-7 16-2-7-7-2z" />);
@@ -23,3 +22,10 @@ export const StackIcon = make(<path d="M12 3l9 5-9 5-9-5 9-5zm-9 9l9 5 9-5M3 16l
 export const SwapIcon = make(<path d="M7 7h13m-4-4l4 4-4 4M17 17H4m4 4l-4-4 4-4" />);
 export const CheckCircleIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M8 12l3 3 5-6" /></>);
 export const WheelIcon = make(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="2" /><path d="M12 14v7M10 11L4 9m10 2l6-2" /></>);
+export const UserCircleIcon = make(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="10" r="3" /><path d="M6.2 18.5c1.3-2 3.100-3 5.800-3s4.500 1 5.800 3" /></>);
+export const BuildingIcon = make(<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />);
+export const PhoneIcon = make(<path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />);
+export const MailIcon = make(<path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />);
+export const RefreshIcon = make(<path d="M4 4v6h6M20 20v-6h-6M20 9A8 8 0 006.5 6.5L4 10m16 4l-2.500 3.500A8 8 0 014 15" />);
+export const InfoIcon = make(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5m0-8h.01" /></>);
+export const HomeIcon = make(<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" />);

@@ -1,26 +1,9 @@
 // Componentes de interfaz. Solo clases del tema (src/theme); textos de marca desde brand.js.
-import { useEffect, useId, useState } from 'react';
+import { createContext, useContext, useEffect, useId, useState } from 'react';
 import { brand } from './brand.js';
-import { ChevronDownIcon, ChevronLeftIcon, EyeIcon, EyeOffIcon, LockIcon, LogoutIcon } from './icons.jsx';
+import { ChevronDownIcon, EyeIcon, EyeOffIcon, LockIcon } from './icons.jsx';
 import logo from './assets/logo3.png';
 import partner from './assets/sbi.jpg';
-
-export function useOnline() {
-  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine);
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener('online', on);
-    window.addEventListener('offline', off);
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
-  }, []);
-  return online;
-}
-
-export function OnlineChip() {
-  const online = useOnline();
-  return <span className={`chip${online ? ' chip--ok' : ''}`}><span className="chip__dot" />{online ? 'En línea' : 'Sin conexión'}</span>;
-}
 
 export function AppFooter() {
   return (
@@ -31,29 +14,50 @@ export function AppFooter() {
   );
 }
 
-// variant "light": header blanco con logo centrado (login). "dark": logo en chip blanco, estado o salir a la derecha y barra de pantalla.
-export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, onLogout, top = true, children }) {
+export const MenuContext = createContext([]);
+
+function MenuButton() {
+  const items = useContext(MenuContext);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+  if (!items.length) return null;
+  return (
+    <div className="menu">
+      <button className="menu__btn" aria-label="Abrir menú" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <span /><span /><span />
+      </button>
+      {open && (
+        <>
+          <div className="menu__backdrop" onClick={() => setOpen(false)} />
+          <div className="menu__panel" role="menu">
+            {items.map((it) => (
+              <div key={it.label} className={it.separated ? 'menu__sep' : undefined}>
+                <button role="menuitem" className={`menu__item${it.danger ? ' menu__item--danger' : ''}`} aria-current={it.current ? 'page' : undefined} onClick={() => { setOpen(false); it.onClick(); }}>
+                  <it.icon />{it.label}
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Header único de una sola fila: logo, título de la pantalla y menú.
+export function Shell({ title, titleIcon: TitleIcon, top = true, children }) {
   return (
     <div className={`app${top ? ' app--top' : ''}`}>
-      {variant === 'light' ? (
-        <header className="app-header"><img src={logo} alt={brand.clientName} /></header>
-      ) : (
-        <header className="app-header app-header--dark">
-          <div className="app-header__row">
-            <span className="app-header__logo"><img src={logo} alt={brand.clientName} style={{ height: '100%' }} /></span>
-            {onLogout
-              ? <button className="app-header__action" onClick={onLogout}><LogoutIcon width="14" height="14" />Salir</button>
-              : <OnlineChip />}
-          </div>
-          {title && (
-            <div className="screen-bar">
-              <button className="icon-btn" onClick={onBack} aria-label="Volver"><ChevronLeftIcon /></button>
-              <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>
-              <span className="screen-bar__spacer" />
-            </div>
-          )}
-        </header>
-      )}
+      <header className="app-header">
+        <span className="app-header__logo"><img src={logo} alt={brand.clientName} /></span>
+        {title && <div className="title-badge">{TitleIcon && <TitleIcon />}<h1>{title}</h1></div>}
+        <MenuButton />
+      </header>
       <main className="app__main">{children}</main>
       <AppFooter />
     </div>
@@ -62,12 +66,11 @@ export function Shell({ variant = 'dark', title, titleIcon: TitleIcon, onBack, o
 
 export const Card = ({ className = '', ...p }) => <section className={`card ${className}`} {...p} />;
 
-export function SectionCard({ icon: Icon, title, hint, children }) {
+export function SectionCard({ icon: Icon, title, children }) {
   return (
     <section className="card card--section">
       <div className="card__head">
         <h2 className="card__title">{Icon && <Icon />}{title}</h2>
-        {hint && <span className="card__hint">{hint}</span>}
       </div>
       {children}
     </section>
@@ -101,6 +104,6 @@ export function PasswordField(props) {
   );
 }
 
-export function Button({ icon: Icon, iconStart: IconStart, large, children, ...props }) {
-  return <button className={`btn${large ? ' btn--lg' : ''}`} {...props}>{IconStart && <IconStart />}<span>{children}</span>{Icon && <Icon />}</button>;
+export function Button({ icon: Icon, iconStart: IconStart, large, variant, children, ...props }) {
+  return <button className={`btn${large ? ' btn--lg' : ''}${variant ? ` btn--${variant}` : ''}`} {...props}>{IconStart && <IconStart />}<span>{children}</span>{Icon && <Icon />}</button>;
 }

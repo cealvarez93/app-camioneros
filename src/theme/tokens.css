@@ -25,8 +25,6 @@
   --color-text-label: #cbd5e1;
   --color-text-muted: #94a3b8;
   --color-placeholder: #64748b;
-  --color-header-bg: #ffffff;
-  --color-header-border: #e2e8f0;
   --color-header-dark-bg: rgba(11, 13, 18, 0.92);
   --color-overlay: rgba(2, 6, 23, 0.55);
   --color-chip-bg: #ffffff;
@@ -55,6 +53,8 @@
   /* Tarjeta destacada del inicio */
   --hero-overlay: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.9) 100%);
   --hero-height: 11rem;
+  --hero-overlay-fill: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.05) 32%, rgba(2, 6, 23, 0.45) 62%, rgba(2, 6, 23, 0.94) 100%);
+  --color-surface-glass: rgba(15, 23, 42, 0.72);
   --hero-image: none; /* la pantalla de inicio la sobrescribe con la imagen de marca */
 
   /* Forma */
@@ -73,6 +73,10 @@
   /* Gradientes */
   --gradient-brand: linear-gradient(90deg, var(--color-brand), var(--color-brand-strong));
   --gradient-page: radial-gradient(circle at 50% 0%, var(--brand-glow) 0%, var(--color-bg) 75%);
+
+  --gradient-raised: linear-gradient(180deg, #1c222c 0%, #151920 100%);
+  --gradient-avatar: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  --color-avatar-ring: rgba(239, 68, 68, 0.4);
 
   /* Tipografía */
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
@@ -98,7 +102,6 @@
   --space-6: 1.5rem;
   --space-8: 2rem;
   --content-max: 28rem;
-  --header-height: 4rem;
   --control-height: 3.25rem;
   --transition: 200ms ease;
 }

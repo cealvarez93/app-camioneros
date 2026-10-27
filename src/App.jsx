@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { api } from './api.js';
 import { brand } from './brand.js';
 import { buildQrPayload } from './qr.js';
-import { ArrowIcon, BoxIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, MapPinIcon, NavigationIcon, QrIcon, StackIcon, SwapIcon, TruckIcon, UserIcon, WheelIcon } from './icons.jsx';
-import { Button, Card, Field, PasswordField, SectionCard, Shell } from './ui.jsx';
+import { formatRut, iniciales } from './format.js';
+import { ArrowIcon, BoxIcon, HomeIcon, LogoutIcon, BuildingIcon, CheckCircleIcon, ChevronRightIcon, ClockIcon, FlagIcon, IdCardIcon, InfoIcon, MailIcon, MapPinIcon, NavigationIcon, PhoneIcon, QrIcon, RefreshIcon, StackIcon, SwapIcon, TruckIcon, UserCircleIcon, UserIcon, WheelIcon } from './icons.jsx';
+import { Button, Card, Field, MenuContext, PasswordField, SectionCard, Shell } from './ui.jsx';
 import hero from './assets/bg3.jpg';
 
 const PALLETS = Array.from({ length: 30 }, (_, i) => String(i + 1));
@@ -29,9 +30,8 @@ function Login({ onLogin }) {
     }
   };
   return (
-    <Shell variant="light" top={false}>
-      <div className="badge"><TruckIcon />{brand.appName}<span className="badge__version">{brand.version}</span></div>
-      <p className="tagline">{brand.tagline}</p>
+    <Shell top={false}>
+      <div className="badge"><TruckIcon />{brand.appName}</div>
       <Card>
         <form onSubmit={submit} className="stack">
           <Field label="Usuario" icon={UserIcon} value={user} onChange={(e) => setUser(e.target.value)} autoComplete="username" placeholder="Ingresa tu ID de usuario" required />
@@ -44,7 +44,7 @@ function Login({ onLogin }) {
   );
 }
 
-function Home({ session, go, logout }) {
+function Home({ session, go }) {
   const [trip, setTrip] = useState(null);
   const [wait, setWait] = useState(null);
   useEffect(() => {
@@ -52,58 +52,99 @@ function Home({ session, go, logout }) {
     api.queue().then((c) => setWait((c?.QuantityTrucks ?? 0) * (c?.Minutesxtruck ?? 0))).catch(() => {});
   }, [session.driverId]);
   return (
-    <Shell onLogout={logout}>
-      <section className="hero" style={{ '--hero-image': `url(${hero})` }}>
-        <div className="hero__top">
-          <span className={`chip${trip ? ' chip--ok' : ''}`}><span className="chip__dot" />{trip ? 'Viaje registrado' : 'Sin viaje registrado'}</span>
-          {trip && <span className="chip chip--mono">{trip.Truck}</span>}
-        </div>
+    <Shell>
+      <section className="hero hero--fill" style={{ '--hero-image': `url(${hero})` }}>
         <div>
-          <p className="hero__label">{trip ? 'Ruta asignada' : 'Viaje'}</p>
-          <h2 className="hero__route">{trip ? `${trip.Origin} → ${trip.Destination}` : 'Registra tu viaje para generar el QR'}</h2>
-          {trip && <div className="hero__meta"><span>Remolque {trip.Trailer}</span><span>{trip.Pallet} pallets</span><span>{trip.OperaPon}</span></div>}
+          {trip && (
+            <div className="status-card">
+              <MapPinIcon className="status-card__icon" />
+              <span className="status-card__route">{trip.Origin} → {trip.Destination}</span>
+              <span className="chip chip--mono">{trip.Truck}</span>
+            </div>
+          )}
+        </div>
+        <div className="actions">
+          <button className="action action--primary" onClick={() => go('trip')}>
+            <TruckIcon className="action__icon" />
+            <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span></span>
+            <span className="action__go"><ChevronRightIcon /></span>
+          </button>
+          <button className="action" onClick={() => go('profile')}>
+            <span className="action__top"><IdCardIcon className="action__icon" /></span>
+            <span className="action__title">Perfil conductor</span>
+          </button>
+          <button className="action action--ok" onClick={() => go('pass')}>
+            <span className="action__top"><QrIcon className="action__icon" />{wait !== null && <span className="chip chip--ok">{wait} min</span>}</span>
+            <span className="action__title">Pase de validación</span>
+          </button>
         </div>
       </section>
-      <div className="section-head"><h2>Operaciones rápidas</h2><span>4 módulos</span></div>
-      <div className="actions">
-        <button className="action action--primary" onClick={() => go('trip')}>
-          <TruckIcon className="action__icon" />
-          <span className="action__grow"><span className="action__title">{trip ? 'Actualizar viaje' : 'Iniciar viaje'}</span><span className="action__hint">Origen, destino y carga</span></span>
-          <ChevronRightIcon className="action__go" />
-        </button>
-        <button className="action" onClick={() => go('profile')}>
-          <IdCardIcon className="action__icon" />
-          <span><span className="action__title">Perfil conductor</span><span className="action__hint">Tus datos y tu empresa</span></span>
-        </button>
-        <button className="action action--warn" onClick={() => go('queue')}>
-          <ClockIcon className="action__icon" />
-          <span><span className="action__title">Tiempo de espera</span><span className="action__hint">{wait === null ? 'Estimación en cola' : `Aprox. ${wait} min`}</span></span>
-        </button>
-        <button className="action action--ok action--wide" onClick={() => go('qr')}>
-          <QrIcon className="action__icon" />
-          <span><span className="action__title">Código QR</span><span className="action__hint">Muéstralo al portero</span></span>
-        </button>
-      </div>
     </Shell>
   );
 }
 
-function Profile({ session, back }) {
+function About() {
+  const rows = [
+    ['Aplicación', brand.appName, TruckIcon],
+    ['Versión', brand.version.replace(/^v/, ''), InfoIcon],
+    ['Cliente', brand.clientName, BuildingIcon],
+    ['Desarrollado por', brand.partnerName, UserCircleIcon],
+  ];
+  return (
+    <Shell title="Acerca de" titleIcon={InfoIcon}>
+      <ul className="list">
+        {rows.map(([label, value, Icon]) => (
+          <li className="list__row" key={label}>
+            <Icon className="list__icon" />
+            <div className="list__text"><p className="list__label">{label}</p><p className="list__value">{value}</p></div>
+          </li>
+        ))}
+      </ul>
+    </Shell>
+  );
+}
+
+function Profile({ session }) {
   const [p, setP] = useState(null);
   const [err, setErr] = useState('');
   useEffect(() => { api.profile(session.driverId).then(setP).catch(() => setErr('No se pudo cargar el perfil')); }, [session.driverId]);
-  const rows = p ? [['Nombre', p.Drv_Name], ['Empresa', p.Drv_Company], ['RUT', p.Drv_UserId], ['Teléfono', p.Drv_Phone], ['Correo', p.Drv_Mail]] : [];
+  const rows = p ? [
+    ['Nombre', p.Drv_Name, UserCircleIcon],
+    ['Empresa', p.Drv_Company, BuildingIcon],
+    ['RUT', formatRut(p.Drv_UserId), IdCardIcon, true],
+    ['Teléfono', p.Drv_Phone, PhoneIcon, true],
+    ['Correo electrónico', p.Drv_Mail, MailIcon],
+  ] : [];
   return (
-    <Shell title="Perfil conductor" titleIcon={IdCardIcon} onBack={back}>
-      <Card>
-        {err && <p className="msg msg--error">{err}</p>}
-        <dl className="profile">{rows.map(([k, v]) => <div className="profile__row" key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
-      </Card>
+    <Shell title="Perfil conductor" titleIcon={IdCardIcon}>
+      {err && <p className="msg msg--error">{err}</p>}
+      {p && (
+        <>
+          <section className="identity">
+            <div className="avatar" aria-hidden="true">{iniciales(p.Drv_Name)}</div>
+            <div>
+              <h2 className="identity__name">{p.Drv_Name}</h2>
+              <p className="identity__company">{p.Drv_Company}</p>
+            </div>
+          </section>
+          <ul className="list">
+            {rows.map(([label, value, Icon, mono]) => (
+              <li className="list__row" key={label}>
+                <Icon className="list__icon" />
+                <div className="list__text">
+                  <p className="list__label">{label}</p>
+                  <p className={`list__value${mono ? ' list__value--mono' : ''}${value ? '' : ' list__value--empty'}`}>{value || 'Sin registrar'}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </Shell>
   );
 }
 
-function Trip({ session, back }) {
+function Trip({ session }) {
   const [lists, setLists] = useState({ o: [], d: [], op: [] });
   const [f, setF] = useState({ Origin: '', Destination: '', Truck: localStorage.getItem('logistic.truck') || '', Trailer: localStorage.getItem('logistic.trailer') || '', Pallet: '', OperaPon: '' });
   const [msg, setMsg] = useState(null);
@@ -125,8 +166,8 @@ function Trip({ session, back }) {
   };
   const options = (items, name) => items.map((i) => <option key={i[name]}>{i[name]}</option>);
   return (
-    <Shell title="Inicio de viaje" titleIcon={TruckIcon} onBack={back}>
-      <SectionCard icon={NavigationIcon} title="Ruta de despacho" hint="Origen y destino">
+    <Shell title="Inicio de viaje" titleIcon={TruckIcon}>
+      <SectionCard icon={NavigationIcon} title="Ruta de despacho">
         <Field as="select" label="Origen" labelIcon={MapPinIcon} tone="ok" required mark value={f.Origin} onChange={set('Origin')}>
           <option value="">Seleccione origen</option>{options(lists.o, 'Loc_Name')}
         </Field>
@@ -134,7 +175,7 @@ function Trip({ session, back }) {
           <option value="">Seleccione destino</option>{options(lists.d, 'Loc_Name')}
         </Field>
       </SectionCard>
-      <SectionCard icon={TruckIcon} title="Equipo y carga" hint="Identificación">
+      <SectionCard icon={TruckIcon} title="Equipo y carga">
         <div className="grid-2">
           <Field label="Tracto" labelIcon={WheelIcon} mono required mark mark value={f.Truck} onChange={plate('Truck')} placeholder="Ej: ABCD12" autoCapitalize="characters" />
           <Field label="Remolque" labelIcon={BoxIcon} mono required mark mark value={f.Trailer} onChange={plate('Trailer')} placeholder="Ej: ABCD12" autoCapitalize="characters" />
@@ -147,58 +188,81 @@ function Trip({ session, back }) {
         </Field>
       </SectionCard>
       {msg && <p className={`msg ${msg.err ? 'msg--error' : 'msg--ok'}`} role="status">{msg.text}</p>}
-      <div>
-        <Button large iconStart={CheckCircleIcon} onClick={save}>Confirmar viaje</Button>
-        <p className="note">Al confirmar, tu QR queda listo para mostrarlo al portero.</p>
-      </div>
+      <Button large iconStart={CheckCircleIcon} onClick={save}>Confirmar viaje</Button>
     </Shell>
   );
 }
 
-function Queue({ back }) {
-  const [min, setMin] = useState(null);
-  useEffect(() => { api.queue().then((c) => setMin((c?.QuantityTrucks ?? 0) * (c?.Minutesxtruck ?? 0))).catch(() => setMin(-1)); }, []);
-  return (
-    <Shell title="Tiempo de espera" titleIcon={ClockIcon} onBack={back}>
-      <Card>
-        {min === null && <p className="msg">Calculando…</p>}
-        {min < 0 && <p className="msg msg--error">No se pudo obtener el tiempo de espera</p>}
-        {min >= 0 && <div className="metric"><div className="metric__value">{min}</div><div className="metric__unit">minutos de espera aproximada</div></div>}
-      </Card>
-    </Shell>
-  );
-}
-
-function Qr({ session, back }) {
-  const [img, setImg] = useState('');
-  const [err, setErr] = useState('');
-  useEffect(() => {
-    (async () => {
-      try {
-        const trip = await api.trip(session.driverId);
-        if (!trip) return setErr('Primero registra tu viaje');
-        setImg(await QRCode.toDataURL(buildQrPayload(session.userId, trip), { width: 480, margin: 2 }));
-      } catch { setErr('No se pudo generar el QR'); }
-    })();
+function Pass({ session, go }) {
+  const [st, setSt] = useState({ loading: true });
+  const cargar = useCallback(async () => {
+    setSt((s) => ({ ...s, loading: true }));
+    const [trip, queue] = await Promise.allSettled([api.trip(session.driverId), api.queue()]);
+    if (trip.status === 'rejected') return setSt({ error: 'No se pudo actualizar el pase' });
+    const t = trip.value;
+    const q = queue.status === 'fulfilled' ? queue.value : null;
+    const qr = t ? await QRCode.toDataURL(buildQrPayload(session.userId, t), { width: 480, margin: 1 }) : '';
+    setSt({ trip: t, qr, trucks: q?.QuantityTrucks ?? null, perTruck: q?.Minutesxtruck ?? null });
   }, [session]);
+  useEffect(() => { cargar(); }, [cargar]);
+  const { trip, qr, trucks, perTruck, error, loading } = st;
+  const wait = trucks === null || trucks === undefined ? null : trucks * perTruck;
+  const facts = trip ? [['Tracto', trip.Truck, true], ['Remolque', trip.Trailer, true], ['Destino', trip.Destination], ['Carga', `${trip.Pallet} pallets · ${trip.OperaPon}`]] : [];
   return (
-    <Shell title="Código QR" titleIcon={QrIcon} onBack={back}>
-      <Card>
-        {err ? <p className="msg msg--error">{err}</p> : img && <><img className="qr" src={img} alt="Código QR del viaje" /><p className="qr-caption">Muestra este código al portero</p></>}
-      </Card>
+    <Shell title="Pase de validación" titleIcon={QrIcon}>
+      <SectionCard icon={ClockIcon} title="Tiempo de espera estimado">
+        {wait === null
+          ? <p className="msg">{loading ? 'Calculando…' : 'Sin estimación disponible'}</p>
+          : <div className="metric"><span className="metric__value">{wait}</span><span className="metric__unit">minutos</span></div>}
+      </SectionCard>
+      <SectionCard icon={QrIcon} title="Código QR">
+        {error && <p className="msg msg--error">{error}</p>}
+        {!error && !loading && !trip && (
+          <>
+            <p className="msg">Primero registra tu viaje para generar el QR.</p>
+            <Button large iconStart={TruckIcon} onClick={() => go('trip')}>Iniciar viaje</Button>
+          </>
+        )}
+        {trip && qr && (
+          <>
+            <div className="qr-frame"><img src={qr} alt="Código QR del viaje" /><i /><i /><i /><i /></div>
+            <dl className="facts">{facts.map(([k, v, mono]) => <div key={k}><dt>{k}</dt><dd className={mono ? 'facts__mono' : ''}>{v}</dd></div>)}</dl>
+          </>
+        )}
+      </SectionCard>
+      <Button variant="secondary" iconStart={RefreshIcon} onClick={cargar} disabled={loading}>{loading ? 'Actualizando…' : 'Actualizar'}</Button>
     </Shell>
   );
 }
 
+// La navegación usa el historial del navegador: el botón atrás del navegador o de Android vuelve a la pantalla anterior.
 export default function App() {
   const [session, setSession] = useState(load());
-  const [screen, setScreen] = useState('home');
-  const back = () => setScreen('home');
-  if (!session) return <Login onLogin={setSession} />;
-  const logout = () => { localStorage.removeItem(SESSION); setSession(null); setScreen('home'); };
-  if (screen === 'profile') return <Profile session={session} back={back} />;
-  if (screen === 'trip') return <Trip session={session} back={back} />;
-  if (screen === 'queue') return <Queue back={back} />;
-  if (screen === 'qr') return <Qr session={session} back={back} />;
-  return <Home session={session} go={setScreen} logout={logout} />;
+  const [screen, setScreen] = useState(() => window.history.state?.screen ?? 'home');
+  useEffect(() => {
+    window.history.replaceState({ screen }, '');
+    const onPop = (e) => setScreen(e.state?.screen ?? 'home');
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const go = (s) => { window.history.pushState({ screen: s }, ''); setScreen(s); };
+  const logout = () => { localStorage.removeItem(SESSION); setSession(null); window.history.replaceState({ screen: 'home' }, ''); setScreen('home'); };
+  const menu = [
+    { label: 'Inicio', icon: HomeIcon, current: screen === 'home', onClick: () => screen !== 'home' && go('home') },
+    { label: 'Viaje', icon: TruckIcon, current: screen === 'trip', onClick: () => go('trip') },
+    { label: 'Perfil conductor', icon: IdCardIcon, current: screen === 'profile', onClick: () => go('profile') },
+    { label: 'Pase de validación', icon: QrIcon, current: screen === 'pass', onClick: () => go('pass') },
+    { label: 'Acerca de', icon: InfoIcon, current: screen === 'about', onClick: () => go('about') },
+    { label: 'Cerrar sesión', icon: LogoutIcon, danger: true, separated: true, onClick: logout },
+  ];
+  const view = (() => {
+    if (screen === 'about') return <About />;
+    if (!session) return <Login onLogin={setSession} />;
+    if (screen === 'profile') return <Profile session={session} />;
+    if (screen === 'trip') return <Trip session={session} />;
+    if (screen === 'pass') return <Pass session={session} go={go} />;
+    return <Home session={session} go={go} />;
+  })();
+  const publicMenu = menu.filter((it) => it.label === 'Acerca de');
+  return <MenuContext.Provider value={session ? menu : publicMenu}>{view}</MenuContext.Provider>;
 }
